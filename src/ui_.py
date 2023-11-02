@@ -1,4 +1,7 @@
 import customtkinter as ctk
+# import cv2
+# import customtkinter as ctk
+# cap = cv2.VideoCapture(0)
 
 class MainFrame(ctk.CTkFrame) :
 	def __init__(self, master):
@@ -6,7 +9,7 @@ class MainFrame(ctk.CTkFrame) :
 		
 		self.grid_columnconfigure(0, minsize=150, weight=1)
 		self.grid_rowconfigure(0, minsize=150, weight=1)
-		self.label = ctk.CTkLabel(master=self, text="main_frame", corner_radius=10, height=350, text_color="#ffffff", fg_color="#333333")
+		self.label = ctk.CTkLabel(master=self, corner_radius=10, text_color="#ffffff", fg_color="#333333")
 		self.label.grid(pady=10, padx=5, row=0, column=0, sticky="we")
 
 class LeftFrame(ctk.CTkFrame) :
@@ -38,10 +41,10 @@ class SearchBar(ctk.CTkFrame) :
 		self.grid_columnconfigure(1, weight=0)
 		
 		self.entry = ctk.CTkEntry(master=self, fg_color="transparent", placeholder_text="Search User")
-		self.entry.grid(row=0, column=0, sticky="we")
+		self.entry.grid(padx=5, pady=5, row=0, column=0, sticky="we")
 		
-		self.submit = ctk.CTkButton(master=self, text="->", width=30)
-		self.submit.grid(padx=(3,0), row=0, column=1)
+		# self.submit = ctk.CTkButton(master=self, text="->", width=30)
+		# self.submit.grid(padx=(3,0), row=0, column=1)
 		
 		
 		
