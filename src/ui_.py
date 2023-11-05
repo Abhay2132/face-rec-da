@@ -9,8 +9,12 @@ class MainFrame(ctk.CTkFrame) :
 		
 		self.grid_columnconfigure(0, minsize=150, weight=1)
 		self.grid_rowconfigure(0, minsize=150, weight=1)
-		self.label = ctk.CTkLabel(master=self, corner_radius=10, text_color="#ffffff", fg_color="#333333")
+		
+		self.label = ctk.CTkLabel(master=self, text="Starting Camera ...", corner_radius=10, text_color="#ffffff", fg_color="#333333")
 		self.label.grid(pady=10, padx=5, row=0, column=0, sticky="we")
+
+		self.fps = ctk.CTkLabel(master=self, text="fps : 0")
+		self.fps.grid(row=0, column=0, padx=10, sticky="ne")
 
 class LeftFrame(ctk.CTkFrame) :
 	def __init__(self, master):

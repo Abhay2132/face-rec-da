@@ -1,3 +1,4 @@
+import time
 import customtkinter as ctk
 import ui_
 from PIL import Image
@@ -8,15 +9,13 @@ width, height = 800, 600
 # Set the width and height 
 
 class App(ctk.CTk):
-	cam_h, cam_w = 800,400
+	cam_h, cam_w = 800,200
+	lastTime = 0
+	lastFpsTick = 0
 	def __init__(self):
 		super().__init__()
 		self.geometry("800x400")
 		self.title("Abhay")
-
-		self.cap = cv2.VideoCapture(0)
-		self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, width) 
-		self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height) 
 
 		self.mainFrame = ui_.MainFrame(self)
 		self.leftFrame = ui_.LeftFrame(self)
@@ -35,9 +34,25 @@ class App(ctk.CTk):
 		
 		self.bind("<Configure>", self.on_resize)
 
+	def initCamera(self):
+		self.cap = cv2.VideoCapture(0)
+		self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, width) 
+		self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height) 
+		self.update()
 
 	def update(self):
+		now = time.time()
+
+		if(int(now - self.lastFpsTick) >= 1) :
+			dt = (now - self.lastTime)
+			fps = 1/dt
+			self.mainFrame.fps.configure(text='fps : ' + str(int(fps)))
+			self.lastFpsTick = now
+		
+		self.lastTime = time.time()
+
 		ret, frame = self.cap.read()
+		frame = cv2.flip(frame, 1)
 		_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA) 
 		if ret:
 			image = Image.fromarray(_frame)
@@ -48,6 +63,8 @@ class App(ctk.CTk):
 			self.cap.release()
 			self.mainFrame.label.destroy()
 			self.quit()
+		
+
 
 	def on_resize(self, event):
 		# screen_height = event.height
@@ -64,5 +81,5 @@ if __name__ == "__main__":
 	# ctk.set_default_color_theme("green")
 	ctk.set_appearance_mode("light")
 	app = App()
-	app.update()
+	# app.after(2000, app.initCamera)
 	app.mainloop() 

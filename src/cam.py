@@ -1,64 +1,61 @@
-# Python program to open the 
-# camera in Tkinter 
-# Import the libraries, 
-# tkinter, cv2, Image and ImageTk 
-
 from tkinter import *
 import cv2 
+import time
 from PIL import Image, ImageTk 
 
-# Define a video capture object 
 vid = cv2.VideoCapture(0) 
-
-# Declare the width and height in variables 
-width, height = 800, 600
-
+width, height = 800, 400
 # Set the width and height 
 vid.set(cv2.CAP_PROP_FRAME_WIDTH, width) 
 vid.set(cv2.CAP_PROP_FRAME_HEIGHT, height) 
 
-# Create a GUI app 
 app = Tk() 
-
-# Bind the app with Escape keyboard to 
-# quit app whenever pressed 
 app.bind('<Escape>', lambda e: app.quit()) 
 
-# Create a label and display it on app 
 label_widget = Label(app) 
 label_widget.pack() 
 
-# Create a function to open camera and 
-# display it in the label_widget on app 
+face_classifier = cv2.CascadeClassifier(
+    cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+)
 
-
+lastTime = 0
+lastFps = 0
 def open_camera(): 
-
-	# Capture the video frame by frame 
 	_, frame = vid.read() 
+	frame = cv2.flip(frame, 1)
+	now = time.time()
 
-	# Convert image from one color space to other 
+	global lastTime
+	global lastFps
+	global fps
+	if(now - lastFps >= 1):
+		lastFps = now	
+		tick = now - lastTime
+		fpsCount = 1/tick
+		fps.configure(text="FPS : "+str(int(fpsCount)))
+
+
 	opencv_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA) 
+	gray_image = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-	# Capture the latest frame and transform to image 
+	faces = face_classifier.detectMultiScale(gray_image, scaleFactor=1.1, minNeighbors=5, minSize=(4,4))
+	for (x, y, w, h) in faces:
+		cv2.rectangle(opencv_image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
 	captured_image = Image.fromarray(opencv_image) 
-
-	# Convert captured image to photoimage 
 	photo_image = ImageTk.PhotoImage(image=captured_image) 
 
-	# Displaying photoimage in the label 
 	label_widget.photo_image = photo_image 
-
-	# Configure image in the label 
 	label_widget.configure(image=photo_image) 
+	label_widget.after(1, open_camera) 
+	
+	lastTime = now
 
-	# Repeat the same process after every 10 seconds 
-	label_widget.after(10, open_camera) 
+# button1 = Button(app, text="Open Camera", command=open_camera) 
+# button1.pack() 
+label_widget.after(10, open_camera)
 
-
-# Create a button to open the camera in GUI app 
-button1 = Button(app, text="Open Camera", command=open_camera) 
-button1.pack() 
-
-# Create an infinite loop for displaying app on screen 
+fps = Label(app,text="FPS : 0")
+fps.pack()
 app.mainloop() 
